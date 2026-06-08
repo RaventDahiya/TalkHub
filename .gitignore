@@ -29,3 +29,6 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Interview Prep Guide (Keep Local Only)
+INTERVIEW_PREPARATION.md
