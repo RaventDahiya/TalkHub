@@ -9,16 +9,38 @@ require('dotenv').config();
 const app = express();
 const server = http.createServer(app);
 
+// Setup CORS origins
+const allowedOrigins = process.env.CLIENT_URL 
+  ? process.env.CLIENT_URL.split(',') 
+  : ['http://localhost:5173', 'http://127.0.0.1:5173'];
+
 // Setup Socket.io
 const io = socketIo(server, {
   cors: {
-    origin: '*', // Allow all origins for development ease
-    methods: ['GET', 'POST']
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl) or if origin is in allowedOrigins or if it's development/wildcard fallback
+      if (!origin || allowedOrigins.indexOf(origin) !== -1 || !process.env.CLIENT_URL) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1 || !process.env.CLIENT_URL) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 app.use(express.json());
 
 // Database Connection
