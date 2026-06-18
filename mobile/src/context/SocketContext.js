@@ -24,7 +24,7 @@ export const SocketProvider = ({ children }) => {
     console.log(`[Socket Mobile Client] Connecting to: ${BASE_URL}`);
     
     const socketInstance = io(BASE_URL, {
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'], // Start with polling first for Android reliability
       autoConnect: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000

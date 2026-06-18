@@ -77,13 +77,6 @@ export default function ChatScreen({ route, navigation }) {
   useEffect(() => {
     if (!socket || !roomId) return;
 
-    // Join room
-    socket.emit('joinRoom', {
-      roomId,
-      username: user.username,
-      userId: user.id
-    });
-
     setMessages([]);
     setOnlineUsers([]);
     setTypingUsers([]);
@@ -143,6 +136,7 @@ export default function ChatScreen({ route, navigation }) {
       );
     };
 
+    // 1. Register listeners FIRST
     socket.on('message', handleNewMessage);
     socket.on('loadHistory', handleLoadHistory);
     socket.on('onlineUsers', handleOnlineUsers);
@@ -150,6 +144,13 @@ export default function ChatScreen({ route, navigation }) {
     socket.on('userLeft', handleUserLeft);
     socket.on('typing', handleTyping);
     socket.on('reactionUpdate', handleReactionUpdate);
+
+    // 2. Emit joinRoom AFTER listeners are ready
+    socket.emit('joinRoom', {
+      roomId,
+      username: user.username,
+      userId: user.id
+    });
 
     return () => {
       socket.emit('leaveRoom', { roomId, username: user.username });
